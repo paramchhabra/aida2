@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Eligibility Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        main {
+            margin: 20px auto;
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1.1em;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            font-size: 1em;
+            margin: 10px 1%;
+            color: white;
+            background-color: #4caf50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        async function checkEligibility() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            // Clear previous results
+            resultDiv.innerHTML = '';
+
+            if (!studentId) {
+                resultDiv.innerHTML = '<p class="error">Please enter a valid Student ID.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8080/eligibility', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: studentId })
+                });
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <p><strong>Student ID:</strong> ${data.student_id}</p>
+                    <p><strong>Scholarship Eligibility:</strong> ${data.scholarship_eligible ? 'Eligible' : 'Not Eligible'}</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: Could not fetch the data. Please ensure the server is running.</p>`;
+            }
+        }
+
+        async function checkExamPermission() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            // Clear previous results
+            resultDiv.innerHTML = '';
+
+            if (!studentId) {
+                resultDiv.innerHTML = '<p class="error">Please enter a valid Student ID.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8080/debar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: studentId })
+                });
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <p><strong>Student ID:</strong> ${data.student_id}</p>
+                    <p><strong>Exam Permission:</strong> ${data.exam_permitted ? 'Permitted' : 'Not Permitted'}</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: Could not fetch the data. Please ensure the server is running.</p>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>Student Eligibility Checker</header>
+    <main>
+        <label for="studentId">Enter Student ID:</label>
+        <input type="text" id="studentId" placeholder="e.g., 23BCE0275">
+        <div>
+            <button onclick="checkEligibility()">Check Scholarship Eligibility</button>
+            <button onclick="checkExamPermission()">Check Exam Permission</button>
+        </div>
+        <div id="result"></div>
+    </main>
+</body>
+</html>

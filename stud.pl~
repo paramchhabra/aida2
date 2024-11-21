@@ -1,0 +1,12 @@
+:- use_module(library(csv)).
+:- use_module(library(http/http_server)).
+
+% Load CSV data as Prolog facts
+load_csv_data(File) :-
+    csv_read_file(File, Rows, [functor(student), arity(3)]),
+    maplist(assert, Rows).
+
+% Sample facts for illustration
+% student(Student_ID, Attendance_Percentage, CGPA).
+% Example: student('23BCE0275', 85, 9.2).
+
